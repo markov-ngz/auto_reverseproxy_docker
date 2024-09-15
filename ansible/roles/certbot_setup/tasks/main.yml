@@ -1,0 +1,16 @@
+---
+- name: Install required package
+  ansible.builtin.apt:
+    name: "{{ package_nginx }}"
+
+- name: Create python env
+  shell : sudo python3 -m venv /opt/certbot/
+
+- name: Update pip
+  shell: sudo /opt/certbot/bin/pip install --upgrade pip
+
+- name: Install certbot library
+  shell: sudo /opt/certbot/bin/pip install certbot
+
+- name: Create dns certificates
+  shell: sudo certbot certonly --nginx -d {{dns}} --agree-tos -m {{email}} -n

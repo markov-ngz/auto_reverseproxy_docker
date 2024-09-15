@@ -1,0 +1,29 @@
+- name: install packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+    
+- name: Create keyrings directory
+  shell: sudo install -m 0755 -d /etc/apt/keyrings
+
+- name: Download key and setup permissions
+  shell: |
+    sudo curl -x {{socks}} -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+- name: Add the repository to apt sources
+  shell: |
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+- name: apt_update
+  ansible.builtin.apt:
+    update_cache: true
+    
+- name: Install the packages
+  ansible.builtin.apt:
+    name: "{{docker_packages}}"
+    state: present

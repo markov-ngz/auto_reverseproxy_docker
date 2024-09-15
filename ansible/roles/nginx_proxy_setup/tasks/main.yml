@@ -1,0 +1,19 @@
+---
+- name: apt-get update
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+
+
+- name: Install nginx configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload_nginx
+

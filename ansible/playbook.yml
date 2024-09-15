@@ -1,0 +1,66 @@
+---
+- name: Add User and authorize a public key
+  become: yes
+  hosts : 
+    - docker_sudo
+  roles : 
+    - add_user
+  vars : 
+    user_name: "{{ lookup('ansible.builtin.env', 'TF_VAR_user_name') }}"
+    user_public_key : "{{ lookup('ansible.builtin.env', 'USER_PUBLIC_KEY') }}"
+
+- name: Setup NGINX proxy
+  become: yes
+  hosts:
+    - reverseproxy_sudo
+  roles:
+    - certbot_setup
+    - nginx_proxy_setup
+  vars:
+    app_private_ip: 10.0.2.4
+    dns: "{{ lookup('ansible.builtin.env', 'TF_VAR_dns_name') }}"
+
+
+# # !!! ISSUE : ssh -D did not work at role level (agent not trasnporter ) but at playbook's 
+- name: Initiate SSH Proxy Sock process
+  hosts: 
+    - docker_sudo
+  tasks:
+  - name: Initiate proxy sock dynamic port 
+    shell: ssh -D 7070 -C -N -f  {{user_sudo}}@{{bastion_private_ip}} -o CheckHostIP=no -o StrictHostKeyChecking=no
+  vars:
+    user_sudo: ubuntu
+    bastion_private_ip: 10.0.1.4
+
+- name: Install Docker
+  become: yes
+  hosts:
+    - docker_sudo
+  roles :
+    - private_apt_update
+    - docker_setup
+  vars:
+    user_name: "{{ lookup('ansible.builtin.env', 'TF_VAR_user_name') }}" 
+    socks: socks5h://localhost:7070
+    service_sock: socks5://localhost:7070 
+
+- name: Run containers
+  hosts:
+    - docker
+  roles:
+    - docker_run
+  vars:
+    docker_username: "{{ lookup('ansible.builtin.env', 'DOCKER_USERNAME') }}" 
+    docker_password: "{{ lookup('ansible.builtin.env', 'DOCKER_PASSWORD') }}"
+
+- name: Kill SSH Proxy Sock process
+  hosts:
+    - docker_sudo
+  tasks:
+    - name: Kill SSH Proxy Sock process
+      shell : | 
+        for pid in `ps -aux | grep 'ssh -D' | awk '{print $2}'`
+        do
+          kill $pid
+          break
+        done

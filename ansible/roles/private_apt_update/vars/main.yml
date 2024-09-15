@@ -1,0 +1,3 @@
+apt_conf_file: /etc/apt/apt.conf
+apt_proxy_sock_conf: Acquire::http::Proxy "socks5h://localhost:7070";
+proxy_sock_port: 7070

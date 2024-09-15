@@ -1,0 +1,9 @@
+- name: apt_update
+  ansible.builtin.apt:
+    update_cache: true
+    
+- name: daemon-reload
+  shell: sudo systemctl daemon-reload
+
+- name: restart_docker
+  shell: sudo systemctl restart docker

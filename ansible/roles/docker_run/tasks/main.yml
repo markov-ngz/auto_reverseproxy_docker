@@ -1,0 +1,13 @@
+---
+# - name: Log into DockerHub
+#   community.docker.docker_login:
+#     username: "{{docker_username}}"
+#     password: "{{docker_login}}"
+
+- name: Start a simple nginx container
+  community.docker.docker_container:
+    name: mynginx
+    image: nginx
+    state: started
+    ports:
+      - "10.0.2.4:80:80"

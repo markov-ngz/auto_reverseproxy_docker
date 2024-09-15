@@ -1,0 +1,10 @@
+- name: Write configuration file
+  shell : echo '{{apt_proxy_sock_conf}}' > /home/ubuntu/apt.conf
+  
+- name: Copy configuration
+  shell: sudo cp /home/ubuntu/apt.conf /etc/apt/apt.conf
+
+- name: apt-get update
+  ansible.builtin.apt:
+    update_cache: yes
+

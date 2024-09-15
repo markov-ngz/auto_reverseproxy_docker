@@ -1,0 +1,8 @@
+---
+- name: Ensure group "docker" exists with correct gid
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Add user to the docker group
+  shell: sudo usermod -aG docker {{user_name}}

@@ -1,0 +1,20 @@
+all:
+  children:
+    aws:
+      children:
+        public:
+          hosts:
+            reverseproxy:
+              ansible_host: reverseproxy
+              ansible_ssh_extra_args:  -F ./config
+            reverseproxy_sudo:
+              ansible_host: reverseproxy_sudo
+              ansible_ssh_extra_args:  -F ./config
+        private:
+          hosts:
+            docker:
+              ansible_host: docker
+              ansible_ssh_extra_args:  -F ./config
+            docker_sudo:
+              ansible_host: docker_sudo
+              ansible_ssh_extra_args:  -F ./config

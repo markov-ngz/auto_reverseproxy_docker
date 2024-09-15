@@ -1,0 +1,23 @@
+- name: Create a user  with a home directory
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    create_home: yes
+    state: present
+
+- name: Create .ssh directory if it does not exist
+  ansible.builtin.file:
+    path: "/home/{{ user_name }}/.ssh"
+    state: directory
+    mode: '700'
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+- name: Create authorized key file 
+  ansible.builtin.file:
+    path: "/home/{{ user_name }}/.ssh/authorized_keys"
+    state: touch
+    mode: '600'
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+
+- name: Add public key
+  shell : echo "{{ lookup('ansible.builtin.file', '{{user_public_key}}') }}" >> /home/{{ user_name }}/.ssh/authorized_keys

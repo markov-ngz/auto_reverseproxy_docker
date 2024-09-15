@@ -1,0 +1,7 @@
+---
+
+- import_tasks: docker_install.yml
+
+- import_tasks: docker_group.yml
+
+- import_tasks: docker_proxy.yml
